@@ -26,7 +26,7 @@ namespace Sextant.Tests
         /// <summary>
         /// Tests associated with the page stack property.
         /// </summary>
-        public class ThePageStackProperty
+        public class ThePageSubjectProperty
         {
             /// <summary>
             /// Tests to verify the return value is an observable type.
@@ -58,7 +58,7 @@ namespace Sextant.Tests
         /// <summary>
         /// Tests associated with the modal stack property.
         /// </summary>
-        public class TheModalStackProperty
+        public class TheModalSubjectProperty
         {
             /// <summary>
             /// Tests to verify the return value is an observable type.
@@ -305,6 +305,116 @@ namespace Sextant.Tests
                 ViewStackService sut = new ViewStackServiceFixture();
                 await sut.PushPage(new NavigableViewModelMock(), pages: 3);
                 await sut.PopToRootPage();
+
+                // When
+                var result = await sut.PageStack.FirstOrDefaultAsync();
+
+                // Then
+                result.ShouldHaveSingleItem();
+            }
+        }
+
+        /// <summary>
+        /// Tests for the pop to root method.
+        /// </summary>
+        public class ThePopToPageMethod
+        {
+            /// <summary>
+            /// Tests to verify that an exception is thrown if the view model is not on the stack.
+            /// </summary>
+            /// <returns>A completion notification.</returns>
+            [Fact]
+            public async Task Should_Throw_If_View_Model_Not_Present()
+            {
+                // Given
+                ViewStackService sut = new ViewStackServiceFixture();
+
+                // When
+                var result = await Should.ThrowAsync<InvalidOperationException>(async () => await sut.PopToPage<FirstViewModel>()).ConfigureAwait(false);
+
+                // Then
+                result.Message.ShouldBe("FirstViewModel not found.");
+            }
+
+            /// <summary>
+            /// Tests to verify the navigation stack is cleared.
+            /// </summary>
+            /// <returns>A completion notification.</returns>
+            [Fact]
+            public async Task Should_Pop_To_First_Instance()
+            {
+                // Given
+                ViewStackService sut = new ViewStackServiceFixture();
+                await sut.PushPage(new FirstViewModel());
+                await sut.PushPage(new NavigableViewModelMock(), pages: 3);
+
+                // When
+                await sut.PopToPage<FirstViewModel>();
+                var result = await sut.PageStack.FirstOrDefaultAsync();
+
+                // Then
+                result.ShouldHaveSingleItem();
+            }
+
+            /// <summary>
+            /// Tests to verify the navigation stack is cleared.
+            /// </summary>
+            /// <returns>A completion notification.</returns>
+            [Fact]
+            public async Task Should_Not_Pop_Additional_Instance()
+            {
+                // Given
+                int count = 0;
+                ViewStackService sut = new ViewStackServiceFixture();
+                await sut.PushPage(new NavigableViewModelMock(), pages: 3);
+
+                sut.View.PagePopped.Subscribe(_ =>
+                {
+                    count++;
+                });
+
+                // When
+                await sut.PopToPage<FirstViewModel>();
+
+                // Then
+                count.ShouldBe(1);
+            }
+
+            /// <summary>
+            /// Tests to verify the navigatino stack is cleared.
+            /// </summary>
+            /// <returns>A completion notification.</returns>
+            [Fact]
+            public async Task Should_Only_Notify_Pop_Once()
+            {
+                // Given
+                int count = 0;
+                ViewStackService sut = new ViewStackServiceFixture();
+                await sut.PushPage(new NavigableViewModelMock(), pages: 3);
+
+                sut.View.PagePopped.Subscribe(_ =>
+                {
+                    count++;
+                });
+
+                // When
+                await sut.PopToPage<FirstViewModel>();
+
+                // Then
+                count.ShouldBe(1);
+            }
+
+            /// <summary>
+            /// Tests to verify the navigation stack has an element left.
+            /// </summary>
+            /// <returns>A completion notification.</returns>
+            [Fact]
+            public async Task Should_Have_One_Item_On_Stack()
+            {
+                // Given
+                ViewStackService sut = new ViewStackServiceFixture();
+                await sut.PushPage(new NavigableViewModelMock(), pages: 3);
+                await sut.PopToPage<FirstViewModel>();
 
                 // When
                 var result = await sut.PageStack.FirstOrDefaultAsync();

@@ -149,6 +149,29 @@ namespace Sextant
             bool resetStack = false,
             bool animate = true) => PushPage((IViewModel)viewModel, contract, resetStack, animate);
 
+        /// <inheritdoc />
+        public IObservable<Unit> PopToPage<TViewModel>()
+            where TViewModel : class, IViewModel
+        {
+            if (PageSubject.Value.All(vm => vm.GetType() != typeof(TViewModel)))
+            {
+                throw new InvalidOperationException($"{typeof(TViewModel).Name} not found.");
+            }
+
+            var page = PageSubject.Value.First(vm => vm.GetType() == typeof(TViewModel));
+
+            var pageIndex = PageSubject.Value.LastIndexOf(page);
+
+            var indexes = PageSubject.Value.Count - pageIndex + 1;
+
+            for (int i = 0; i < indexes; i++)
+            {
+                PopPage(false);
+            }
+
+            return Observable.Return(Unit.Default);
+        }
+
         /// <summary>
         /// Returns the top modal from the current modal stack.
         /// </summary>

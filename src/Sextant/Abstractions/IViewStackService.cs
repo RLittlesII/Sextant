@@ -44,6 +44,14 @@ namespace Sextant
         IObservable<Unit> PopPage(bool animate = true);
 
         /// <summary>
+        /// Pops the stack to the first instance of <see cref="TViewModel"/>.
+        /// </summary>
+        /// <typeparam name="TViewModel">The view model type.</typeparam>
+        /// <returns>An observable that signals when the pop has been completed.</returns>
+        IObservable<Unit> PopToPage<TViewModel>()
+                    where TViewModel : class, IViewModel;
+
+        /// <summary>
         /// Pops to root page.
         /// </summary>
         /// <param name="animate">If set to <c>true</c> animate.</param>
@@ -101,13 +109,13 @@ namespace Sextant
         IObservable<Unit> PushPage(INavigable page, string? contract = null, bool resetStack = false, bool animate = true);
 
         /// <summary>
-        /// Returns the top page from the current navigation stack.
+        /// Returns the top modal from the current modal stack.
         /// </summary>
         /// <returns>An observable that signals the top page of the stack.</returns>
         IObservable<IViewModel> TopPage();
 
         /// <summary>
-        /// Returns the top modal from the current modal stack.
+        /// Returns the top page from the current navigation stack.
         /// </summary>
         /// <returns>An observable that signals the top modal of the stack.</returns>
         IObservable<IViewModel> TopModal();
