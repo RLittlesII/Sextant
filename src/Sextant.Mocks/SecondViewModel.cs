@@ -3,8 +3,8 @@
     /// <summary>
     /// The second View Model.
     /// </summary>
-    /// <seealso cref="NavigableViewModelMock" />
-    public class SecondViewModel : NavigableViewModelMock
+    /// <seealso cref="NavigableMock" />
+    public class SecondViewModel : NavigableMock
     {
     }
 }

@@ -7,8 +7,8 @@ namespace Sextant.Mocks
     /// <summary>
     /// The first View Model.
     /// </summary>
-    /// <seealso cref="NavigableViewModelMock" />
-    public class FirstViewModel : NavigableViewModelMock
+    /// <seealso cref="NavigableMock" />
+    public class FirstViewModel : NavigableMock
     {
     }
 }

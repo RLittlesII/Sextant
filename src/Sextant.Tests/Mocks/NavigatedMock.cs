@@ -7,9 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Text;
 
-namespace Sextant.Mocks.Mocks
+namespace Sextant.Tests
 {
     internal class NavigatedMock : INavigated
     {

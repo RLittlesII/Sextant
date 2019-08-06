@@ -29,7 +29,7 @@ namespace Sextant.Tests
             _view = Substitute.For<IView>();
             _view.PushPage(Arg.Any<IViewModel>(), Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<bool>()).Returns(Observable.Return(Unit.Default));
             _view.PagePopped.Returns(x => pagePopped.AsObservable());
-            _view.When(view => view.PopPage(Arg.Any<bool>())).Do(caller => pagePopped.OnNext(new NavigableViewModelMock()));
+            _view.When(view => view.PopPage(Arg.Any<bool>())).Do(caller => pagePopped.OnNext(new NavigableMock()));
         }
 
         public static implicit operator ViewStackService(ViewStackServiceFixture fixture) => fixture.Build();
