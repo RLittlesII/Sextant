@@ -381,7 +381,7 @@ namespace Sextant.Tests
             }
 
             /// <summary>
-            /// Tests to verify the navigatino stack is cleared.
+            /// Tests to verify the navigation stack is cleared.
             /// </summary>
             /// <returns>A completion notification.</returns>
             [Fact]
