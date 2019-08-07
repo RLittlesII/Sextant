@@ -318,7 +318,7 @@ namespace Sextant.Tests
         }
 
         /// <summary>
-        /// Tests for the pop to root method.
+        /// Tests for the pop to page method.
         /// </summary>
         public class ThePopToPageMethod
         {
@@ -340,7 +340,7 @@ namespace Sextant.Tests
             }
 
             /// <summary>
-            /// Tests to verify the navigation stack is cleared.
+            /// Tests to verify the navigation stack pops to the an instance of the view model.
             /// </summary>
             /// <param name="first">The first.</param>
             /// <param name="second">The second.</param>
@@ -348,7 +348,7 @@ namespace Sextant.Tests
             /// <returns>A completion notification.</returns>
             [Theory]
             [ClassData(typeof(PopToPageTestData))]
-            public async Task Should_Pop_To_First_Instance(IViewModel first, IViewModel second, IViewModel third)
+            public async Task Should_Pop_To_Instance(IViewModel first, IViewModel second, IViewModel third)
             {
                 // Given
                 ViewStackService sut = new ViewStackServiceFixture().WithView(new NavigationViewMock());
@@ -374,6 +374,33 @@ namespace Sextant.Tests
             {
                 // Given
                 int count = 0;
+                ViewStackService sut = new ViewStackServiceFixture().WithView(new NavigationViewMock());
+                await sut.PushPage(new FirstViewModel(), pages: 3);
+
+                sut
+                    .View
+                    .PagePopped
+                    .Subscribe(_ =>
+                    {
+                        count++;
+                    });
+
+                // When
+                await sut.PopToPage<FirstViewModel>();
+
+                // Then
+                count.ShouldBe(2);
+            }
+
+            /// <summary>
+            /// Tests to verify the navigation stack is cleared.
+            /// </summary>
+            /// <returns>A completion notification.</returns>
+            [Fact]
+            public async Task Should_Only_Notify_Pop_Once()
+            {
+                // Given
+                int count = 0;
                 ViewStackService sut = new ViewStackServiceFixture();
                 await sut.PushPage(new NavigableMock(), pages: 3);
 
@@ -394,7 +421,7 @@ namespace Sextant.Tests
             /// </summary>
             /// <returns>A completion notification.</returns>
             [Fact]
-            public async Task Should_Only_Notify_Pop_Once()
+            public async Task Should_Notify_Each_Pop()
             {
                 // Given
                 int count = 0;
