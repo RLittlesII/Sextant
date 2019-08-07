@@ -26,7 +26,7 @@ namespace Sextant.Mocks
         /// <param name="id">The id of the page.</param>
         public NavigableMock(string id = null)
         {
-            _id = id;
+            _id = id ?? nameof(NavigableMock);
             _navigatedTo = new Subject<Unit>();
             _navigatedFrom = new Subject<Unit>();
             _navigatingTo = new Subject<Unit>();
@@ -35,7 +35,7 @@ namespace Sextant.Mocks
         /// <summary>
         /// Gets the ID of the page.
         /// </summary>
-        public string Id => _id ?? nameof(NavigableMock);
+        public virtual string Id => _id;
 
         /// <inheritdoc />
         public IObservable<Unit> NavigatedTo => _navigatedTo.AsObservable();

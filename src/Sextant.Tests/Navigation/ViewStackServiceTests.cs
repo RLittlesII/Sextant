@@ -4,7 +4,10 @@
 // See the LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -339,21 +342,27 @@ namespace Sextant.Tests
             /// <summary>
             /// Tests to verify the navigation stack is cleared.
             /// </summary>
+            /// <param name="first">The first.</param>
+            /// <param name="second">The second.</param>
+            /// <param name="third">The third.</param>
             /// <returns>A completion notification.</returns>
-            [Fact]
-            public async Task Should_Pop_To_First_Instance()
+            [Theory]
+            [ClassData(typeof(PopToPageTestData))]
+            public async Task Should_Pop_To_First_Instance(IViewModel first, IViewModel second, IViewModel third)
             {
                 // Given
-                ViewStackService sut = new ViewStackServiceFixture();
-                await sut.PushPage(new FirstViewModel());
-                await sut.PushPage(new NavigableMock(), pages: 3);
+                ViewStackService sut = new ViewStackServiceFixture().WithView(new NavigationViewMock());
+                await sut.PushPage(first);
+                await sut.PushPage(second);
+                await sut.PushPage(third);
 
                 // When
                 await sut.PopToPage<FirstViewModel>();
+                var top = await sut.TopPage();
                 var result = await sut.PageStack.FirstOrDefaultAsync();
 
                 // Then
-                result.ShouldHaveSingleItem();
+                result[result.Count - 1].ShouldBe(top);
             }
 
             /// <summary>
@@ -421,6 +430,18 @@ namespace Sextant.Tests
 
                 // Then
                 result.ShouldHaveSingleItem();
+            }
+
+            private class PopToPageTestData : IEnumerable<object[]>
+            {
+                public IEnumerator<object[]> GetEnumerator()
+                {
+                    yield return new object[] { new FirstViewModel(), new SecondViewModel(), new ThirdViewModel() };
+                    yield return new object[] { new SecondViewModel(), new FirstViewModel(), new ThirdViewModel() };
+                    yield return new object[] { new ThirdViewModel(), new FirstViewModel(), new SecondViewModel() };
+                }
+
+                IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
             }
         }
 

@@ -8,7 +8,10 @@ namespace Sextant.Mocks
     /// The first View Model.
     /// </summary>
     /// <seealso cref="NavigableMock" />
-    public class FirstViewModel : NavigableMock
+    public class FirstViewModel
+        : NavigableMock
     {
+        /// <inheritdoc />
+        public override string Id => nameof(FirstViewModel);
     }
 }
