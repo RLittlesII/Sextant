@@ -233,6 +233,134 @@ namespace Sextant.Tests
         }
 
         /// <summary>
+        /// Tests for the pop to page method.
+        /// </summary>
+        public class ThePopToPageMethod
+        {
+            /// <summary>
+            /// Tests to verify that an exception is thrown if the view model is not on the stack.
+            /// </summary>
+            /// <returns>A completion notification.</returns>
+            [Fact]
+            public async Task Should_Throw_If_View_Model_Not_Present()
+            {
+                // Given
+                ViewStackService sut = new ViewStackServiceFixture();
+
+                // When
+                var result = await Should.ThrowAsync<InvalidOperationException>(async () => await sut.PopToPage<FirstViewModel>()).ConfigureAwait(false);
+
+                // Then
+                result.Message.ShouldBe("FirstViewModel not found.");
+            }
+
+            /// <summary>
+            /// Tests to verify the navigation stack pops to the an instance of the view model.
+            /// </summary>
+            /// <param name="first">The first.</param>
+            /// <param name="second">The second.</param>
+            /// <param name="third">The third.</param>
+            /// <returns>A completion notification.</returns>
+            [Theory]
+            [ClassData(typeof(PopToPageTestData))]
+            public async Task Should_Pop_To_First_Instance(IViewModel first, IViewModel second, IViewModel third)
+            {
+                // Given
+                ViewStackService sut = new ViewStackServiceFixture().WithView(new NavigationViewMock());
+                await sut.PushPage(first);
+                await sut.PushPage(second);
+                await sut.PushPage(third);
+
+                // When
+                await sut.PopToPage<FirstViewModel>();
+                var top = await sut.TopPage();
+                var result = await sut.PageStack.FirstOrDefaultAsync();
+
+                // Then
+                result[result.Count].ShouldBe(top);
+            }
+
+            /// <summary>
+            /// Tests to verify the navigation stack is cleared.
+            /// </summary>
+            /// <returns>A completion notification.</returns>
+            [Fact]
+            public async Task Should_Not_Pop_To_Additional_Instance()
+            {
+                // Given
+                ViewStackService sut = new ViewStackServiceFixture().WithView(new NavigationViewMock());
+                await sut.PushPage(new FirstViewModel(), pages: 3);
+
+                // When
+                await sut.PopToPage<FirstViewModel>();
+                var result = await sut.PageStack.FirstOrDefaultAsync();
+
+                // Then
+                result.Count.ShouldBe(2);
+            }
+
+            /// <summary>
+            /// Tests to verify the navigation stack is cleared.
+            /// </summary>
+            /// <returns>A completion notification.</returns>
+            [Fact]
+            public async Task Should_Notify_Single_Pop()
+            {
+                // Given
+                int count = 0;
+                ViewStackService sut = new ViewStackServiceFixture();
+                await sut.PushPage(new NavigableMock(), pages: 3);
+
+                sut
+                    .View
+                    .PagePopped
+                    .Subscribe(_ => count++);
+
+                // When
+                await sut.PopToPage<FirstViewModel>();
+
+                // Then
+                count.ShouldBe(1);
+            }
+
+            /// <summary>
+            /// Tests to verify the navigation stack is cleared.
+            /// </summary>
+            /// <returns>A completion notification.</returns>
+            [Fact]
+            public async Task Should_Notify_Each_Pop()
+            {
+                // Given
+                int count = 0;
+                ViewStackService sut = new ViewStackServiceFixture();
+                await sut.PushPage(new NavigableMock(), pages: 3);
+
+                sut
+                    .View
+                    .PagePopped
+                    .Subscribe(_ => { count++; });
+
+                // When
+                await sut.PopToPage<FirstViewModel>();
+
+                // Then
+                count.ShouldBe(3);
+            }
+
+            private class PopToPageTestData : IEnumerable<object[]>
+            {
+                public IEnumerator<object[]> GetEnumerator()
+                {
+                    yield return new object[] { new FirstViewModel(), new SecondViewModel(), new ThirdViewModel() };
+                    yield return new object[] { new SecondViewModel(), new FirstViewModel(), new ThirdViewModel() };
+                    yield return new object[] { new ThirdViewModel(), new FirstViewModel(), new SecondViewModel() };
+                }
+
+                IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+            }
+        }
+
+        /// <summary>
         /// Tests for the pop to root method.
         /// </summary>
         public class ThePopToRootPageMethod
@@ -282,159 +410,16 @@ namespace Sextant.Tests
             {
                 // Given
                 int count = 0;
-                ViewStackService sut = new ViewStackServiceFixture();
-                await sut.PushPage(new NavigableMock(), pages: 3);
-
-                sut.View.PagePopped.Subscribe(_ =>
-                {
-                    count++;
-                });
-
-                // When
-                await sut.PopToRootPage();
-
-                // Then
-                count.ShouldBe(1);
-            }
-
-            /// <summary>
-            /// Tests to verify the navigation stack has an element left.
-            /// </summary>
-            /// <returns>A completion notification.</returns>
-            [Fact]
-            public async Task Should_Have_One_Item_On_Stack()
-            {
-                // Given
-                ViewStackService sut = new ViewStackServiceFixture();
-                await sut.PushPage(new NavigableMock(), pages: 3);
-                await sut.PopToRootPage();
-
-                // When
-                var result = await sut.PageStack.FirstOrDefaultAsync();
-
-                // Then
-                result.ShouldHaveSingleItem();
-            }
-        }
-
-        /// <summary>
-        /// Tests for the pop to page method.
-        /// </summary>
-        public class ThePopToPageMethod
-        {
-            /// <summary>
-            /// Tests to verify that an exception is thrown if the view model is not on the stack.
-            /// </summary>
-            /// <returns>A completion notification.</returns>
-            [Fact]
-            public async Task Should_Throw_If_View_Model_Not_Present()
-            {
-                // Given
-                ViewStackService sut = new ViewStackServiceFixture();
-
-                // When
-                var result = await Should.ThrowAsync<InvalidOperationException>(async () => await sut.PopToPage<FirstViewModel>()).ConfigureAwait(false);
-
-                // Then
-                result.Message.ShouldBe("FirstViewModel not found.");
-            }
-
-            /// <summary>
-            /// Tests to verify the navigation stack pops to the an instance of the view model.
-            /// </summary>
-            /// <param name="first">The first.</param>
-            /// <param name="second">The second.</param>
-            /// <param name="third">The third.</param>
-            /// <returns>A completion notification.</returns>
-            [Theory]
-            [ClassData(typeof(PopToPageTestData))]
-            public async Task Should_Pop_To_Instance(IViewModel first, IViewModel second, IViewModel third)
-            {
-                // Given
                 ViewStackService sut = new ViewStackServiceFixture().WithView(new NavigationViewMock());
-                await sut.PushPage(first);
-                await sut.PushPage(second);
-                await sut.PushPage(third);
-
-                // When
-                await sut.PopToPage<FirstViewModel>();
-                var top = await sut.TopPage();
-                var result = await sut.PageStack.FirstOrDefaultAsync();
-
-                // Then
-                result[result.Count - 1].ShouldBe(top);
-            }
-
-            /// <summary>
-            /// Tests to verify the navigation stack is cleared.
-            /// </summary>
-            /// <returns>A completion notification.</returns>
-            [Fact]
-            public async Task Should_Not_Pop_Additional_Instance()
-            {
-                // Given
-                int count = 0;
-                ViewStackService sut = new ViewStackServiceFixture().WithView(new NavigationViewMock());
-                await sut.PushPage(new FirstViewModel(), pages: 3);
+                await sut.PushPage(new NavigableMock(), pages: 3);
 
                 sut
                     .View
                     .PagePopped
-                    .Subscribe(_ =>
-                    {
-                        count++;
-                    });
+                    .Subscribe(_ => { count++; });
 
                 // When
-                await sut.PopToPage<FirstViewModel>();
-
-                // Then
-                count.ShouldBe(2);
-            }
-
-            /// <summary>
-            /// Tests to verify the navigation stack is cleared.
-            /// </summary>
-            /// <returns>A completion notification.</returns>
-            [Fact]
-            public async Task Should_Only_Notify_Pop_Once()
-            {
-                // Given
-                int count = 0;
-                ViewStackService sut = new ViewStackServiceFixture();
-                await sut.PushPage(new NavigableMock(), pages: 3);
-
-                sut.View.PagePopped.Subscribe(_ =>
-                {
-                    count++;
-                });
-
-                // When
-                await sut.PopToPage<FirstViewModel>();
-
-                // Then
-                count.ShouldBe(1);
-            }
-
-            /// <summary>
-            /// Tests to verify the navigation stack is cleared.
-            /// </summary>
-            /// <returns>A completion notification.</returns>
-            [Fact]
-            public async Task Should_Notify_Each_Pop()
-            {
-                // Given
-                int count = 0;
-                ViewStackService sut = new ViewStackServiceFixture();
-                await sut.PushPage(new NavigableMock(), pages: 3);
-
-                sut.View.PagePopped.Subscribe(_ =>
-                {
-                    count++;
-                });
-
-                // When
-                await sut.PopToPage<FirstViewModel>();
+                await sut.PopToRootPage();
 
                 // Then
                 count.ShouldBe(1);
@@ -450,25 +435,13 @@ namespace Sextant.Tests
                 // Given
                 ViewStackService sut = new ViewStackServiceFixture();
                 await sut.PushPage(new NavigableMock(), pages: 3);
-                await sut.PopToPage<FirstViewModel>();
+                await sut.PopToRootPage();
 
                 // When
                 var result = await sut.PageStack.FirstOrDefaultAsync();
 
                 // Then
                 result.ShouldHaveSingleItem();
-            }
-
-            private class PopToPageTestData : IEnumerable<object[]>
-            {
-                public IEnumerator<object[]> GetEnumerator()
-                {
-                    yield return new object[] { new FirstViewModel(), new SecondViewModel(), new ThirdViewModel() };
-                    yield return new object[] { new SecondViewModel(), new FirstViewModel(), new ThirdViewModel() };
-                    yield return new object[] { new ThirdViewModel(), new FirstViewModel(), new SecondViewModel() };
-                }
-
-                IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
             }
         }
 
