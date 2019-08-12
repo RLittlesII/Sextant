@@ -162,7 +162,7 @@ namespace Sextant
 
             var pageIndex = PageSubject.Value.LastIndexOf(page);
 
-            var indexes = PageSubject.Value.Count - pageIndex;
+            var indexes = (PageSubject.Value.Count - 1) - pageIndex;
 
             for (int i = 0; i < indexes; i++)
             {
