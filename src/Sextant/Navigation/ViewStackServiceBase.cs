@@ -162,14 +162,7 @@ namespace Sextant
 
             var pageIndex = PageSubject.Value.LastIndexOf(page);
 
-            var indexes = (PageSubject.Value.Count - 1) - pageIndex;
-
-            for (int i = 0; i < indexes; i++)
-            {
-                PopPage(false).Subscribe();
-            }
-
-            return Observable.Return(Unit.Default);
+            return Observable.Return(Unit.Default).Do(_ => PopIndexAndTick(PageSubject, pageIndex));
         }
 
         /// <summary>
@@ -274,6 +267,30 @@ namespace Sextant
                        poppedStack = stack;
                    }
                });
+
+            stackSubject.OnNext(poppedStack);
+        }
+
+        /// <summary>
+        /// Pops the root and notifies observers.
+        /// </summary>
+        /// <typeparam name="T">The view model type.</typeparam>
+        /// <param name="stackSubject">The stack subject.</param>
+        /// <param name="index">The index.</param>
+        protected static void PopIndexAndTick<T>(BehaviorSubject<IImmutableList<T>> stackSubject, int index)
+        {
+            IImmutableList<T> poppedStack = ImmutableList<T>.Empty;
+
+            if (stackSubject?.Value == null || !stackSubject.Value.Any())
+            {
+                throw new InvalidOperationException("Stack is empty.");
+            }
+
+            int indexes = stackSubject.Value.Count - 1 - index;
+            stackSubject
+                .Take(1)
+                .Where(stack => stack != null)
+                .Subscribe(stack => poppedStack = stack.RemoveRange(stack.IndexOf(stack[index + 1]), stackSubject.Value.Count - 1));
 
             stackSubject.OnNext(poppedStack);
         }
