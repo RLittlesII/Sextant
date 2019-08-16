@@ -288,9 +288,9 @@ namespace Sextant
 
             int indexes = stackSubject.Value.Count - 1 - index;
             stackSubject
-                .Take(1)
+                .Take(indexes)
                 .Where(stack => stack != null)
-                .Subscribe(stack => poppedStack = stack.RemoveRange(stack.IndexOf(stack[index + 1]), stackSubject.Value.Count - 1));
+                .Subscribe(stack => poppedStack = stack.RemoveAt(stackSubject.Value.Count - 1));
 
             stackSubject.OnNext(poppedStack);
         }

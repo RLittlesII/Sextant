@@ -273,37 +273,10 @@ namespace Sextant.Tests
 
                 // When
                 await sut.PopToPage<FirstViewModel>();
-                var top = await sut.TopPage();
                 var result = await sut.PageStack.FirstOrDefaultAsync();
 
                 // Then
-                result[result.Count - 1].ShouldBe(top);
-            }
-
-            /// <summary>
-            /// Tests to verify the navigation stack pops to the an instance of the view model.
-            /// </summary>
-            /// <param name="first">The first.</param>
-            /// <param name="second">The second.</param>
-            /// <param name="third">The third.</param>
-            /// <returns>A completion notification.</returns>
-            [Theory]
-            [ClassData(typeof(PopToPageTestData))]
-            public async Task Should_Pop_To_Correct_Type(IViewModel first, IViewModel second, IViewModel third)
-            {
-                // Given
-                ViewStackService sut = new ViewStackServiceFixture().WithView(new NavigationViewMock());
-                await sut.PushPage(first);
-                await sut.PushPage(second);
-                await sut.PushPage(third);
-
-                // When
-                await sut.PopToPage<FirstViewModel>();
-                var top = await sut.TopPage();
-                var result = await sut.PageStack.FirstOrDefaultAsync();
-
-                // Then
-                top.ShouldBeOfType<FirstViewModel>();
+                result[result.Count - 1].ShouldBeOfType<FirstViewModel>();
             }
 
             /// <summary>
@@ -384,9 +357,11 @@ namespace Sextant.Tests
                 public IEnumerator<object[]> GetEnumerator()
                 {
                     yield return new object[] { new FirstViewModel(), new SecondViewModel(), new ThirdViewModel() };
-
-                    // yield return new object[] { new SecondViewModel(), new FirstViewModel(), new ThirdViewModel() };
-                    // yield return new object[] { new ThirdViewModel(), new FirstViewModel(), new SecondViewModel() };
+                    yield return new object[] { new ThirdViewModel(), new FirstViewModel(), new SecondViewModel() };
+                    yield return new object[] { new SecondViewModel(), new ThirdViewModel(), new FirstViewModel() };
+                    yield return new object[] { new FirstViewModel(), new ThirdViewModel(), new SecondViewModel() };
+                    yield return new object[] { new SecondViewModel(), new FirstViewModel(), new ThirdViewModel() };
+                    yield return new object[] { new ThirdViewModel(), new SecondViewModel(), new FirstViewModel() };
                 }
 
                 IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
