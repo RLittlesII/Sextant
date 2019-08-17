@@ -280,6 +280,33 @@ namespace Sextant.Tests
             }
 
             /// <summary>
+            /// Tests to verify the navigation stack pops to the an instance of the view model.
+            /// </summary>
+            /// <param name="first">The first.</param>
+            /// <param name="second">The second.</param>
+            /// <param name="third">The third.</param>
+            /// <returns>A completion notification.</returns>
+            [Theory]
+            [ClassData(typeof(PopToPageTestData))]
+            public async Task Should_Remove_Lists_From_Stack(IViewModel first, IViewModel second, IViewModel third)
+            {
+                // Given
+                ViewStackService sut = new ViewStackServiceFixture().WithView(new NavigationViewMock());
+                await sut.PushPage(first);
+                await sut.PushPage(second);
+                await sut.PushPage(third);
+
+                // When
+                await sut.PopToPage<FirstViewModel>();
+                var result = await sut.PageStack.FirstOrDefaultAsync();
+                var top = await sut.TopPage();
+                var index = result.LastIndexOf(top);
+
+                // Then
+                index.ShouldBe(result.Count - 1);
+            }
+
+            /// <summary>
             /// Tests to verify pop to page does not pop multiple pages of that type.
             /// </summary>
             /// <param name="first">The first.</param>

@@ -84,6 +84,8 @@ namespace Sextant
         Sextant.IView View { get; }
         System.IObservable<System.Reactive.Unit> PopModal(bool animate = True);
         System.IObservable<System.Reactive.Unit> PopPage(bool animate = True);
+        System.IObservable<System.Reactive.Unit> PopToPage<TViewModel>()
+            where TViewModel :  class, Sextant.IViewModel;
         System.IObservable<System.Reactive.Unit> PopToRootPage(bool animate = True);
         System.IObservable<System.Reactive.Unit> PushModal(Sextant.IViewModel modal, [System.Runtime.CompilerServices.NullableAttribute(2)] string contract = null, bool withNavigationPage = True);
         System.IObservable<System.Reactive.Unit> PushModal<[System.Runtime.CompilerServices.NullableAttribute(0)]  TViewModel>([System.Runtime.CompilerServices.NullableAttribute(2)] string contract = null, bool withNavigationPage = True)
@@ -156,6 +158,7 @@ namespace Sextant
         protected static void AddToStackAndTick<[System.Runtime.CompilerServices.NullableAttribute(2)]  T>(System.Reactive.Subjects.BehaviorSubject<System.Collections.Immutable.IImmutableList<T>> stackSubject, T item, bool reset) { }
         public void Dispose() { }
         protected virtual void Dispose(bool disposing) { }
+        protected static void PopIndexAndTick<T>(System.Reactive.Subjects.BehaviorSubject<System.Collections.Immutable.IImmutableList<T>> stackSubject, int index) { }
         public System.IObservable<System.Reactive.Unit> PopModal(bool animate = True) { }
         public System.IObservable<System.Reactive.Unit> PopPage(bool animate = True) { }
         protected static void PopRootAndTick<[System.Runtime.CompilerServices.NullableAttribute(2)]  T>(System.Reactive.Subjects.BehaviorSubject<System.Collections.Immutable.IImmutableList<T>> stackSubject) { }

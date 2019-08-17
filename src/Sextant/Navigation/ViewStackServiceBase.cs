@@ -92,6 +92,22 @@ namespace Sextant
         public IObservable<Unit> PopToRootPage(bool animate = true) => View.PopToRootPage(animate).Do(_ => PopRootAndTick(PageSubject));
 
         /// <inheritdoc />
+        public IObservable<Unit> PopToPage<TViewModel>()
+            where TViewModel : class, IViewModel
+        {
+            if (PageSubject.Value.All(vm => vm.GetType() != typeof(TViewModel)))
+            {
+                throw new InvalidOperationException($"{typeof(TViewModel).Name} not found.");
+            }
+
+            var page = PageSubject.Value.First(vm => vm.GetType() == typeof(TViewModel));
+
+            var pageIndex = PageSubject.Value.LastIndexOf(page);
+
+            return Observable.Return(Unit.Default).Do(_ => PopToIndexAndTick(PageSubject, pageIndex));
+        }
+
+        /// <inheritdoc />
         public IObservable<Unit> PushModal(IViewModel modal, string? contract = null, bool withNavigationPage = true)
         {
             if (modal == null)
@@ -277,21 +293,17 @@ namespace Sextant
         /// <typeparam name="T">The view model type.</typeparam>
         /// <param name="stackSubject">The stack subject.</param>
         /// <param name="index">The index.</param>
-        protected static void PopIndexAndTick<T>(BehaviorSubject<IImmutableList<T>> stackSubject, int index)
+        protected static void PopToIndexAndTick<T>(BehaviorSubject<IImmutableList<T>> stackSubject, int index)
         {
             IImmutableList<T> poppedStack = ImmutableList<T>.Empty;
+            var stack = stackSubject.Value;
 
-            if (stackSubject?.Value == null || !stackSubject.Value.Any())
+            if (stack == null || !stack.Any())
             {
                 throw new InvalidOperationException("Stack is empty.");
             }
 
-            int indexes = stackSubject.Value.Count - 1 - index;
-            stackSubject
-                .Take(indexes)
-                .Where(stack => stack != null)
-                .Subscribe(stack => poppedStack = stack.RemoveAt(stackSubject.Value.Count - 1));
-
+            poppedStack = stack.RemoveRange(index + 1, stack.Count - index - 1);
             stackSubject.OnNext(poppedStack);
         }
 
