@@ -158,7 +158,6 @@ namespace Sextant
         protected static void AddToStackAndTick<[System.Runtime.CompilerServices.NullableAttribute(2)]  T>(System.Reactive.Subjects.BehaviorSubject<System.Collections.Immutable.IImmutableList<T>> stackSubject, T item, bool reset) { }
         public void Dispose() { }
         protected virtual void Dispose(bool disposing) { }
-        protected static void PopIndexAndTick<T>(System.Reactive.Subjects.BehaviorSubject<System.Collections.Immutable.IImmutableList<T>> stackSubject, int index) { }
         public System.IObservable<System.Reactive.Unit> PopModal(bool animate = True) { }
         public System.IObservable<System.Reactive.Unit> PopPage(bool animate = True) { }
         protected static void PopRootAndTick<[System.Runtime.CompilerServices.NullableAttribute(2)]  T>(System.Reactive.Subjects.BehaviorSubject<System.Collections.Immutable.IImmutableList<T>> stackSubject) { }

@@ -77,6 +77,7 @@ namespace Sextant.Mocks
         {
             if (disposing)
             {
+                _pagePopped?.Dispose();
             }
         }
     }
