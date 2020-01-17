@@ -626,7 +626,7 @@ namespace Sextant.Tests
             public ThePushModalGenericMethod()
             {
                 Locator.CurrentMutable.Register(() => new DefaultViewModelFactory(), typeof(IViewModelFactory));
-                Locator.CurrentMutable.Register(() => new NavigableViewModelMock());
+                Locator.CurrentMutable.Register(() => new NavigableMock());
                 Locator.CurrentMutable.UnregisterAll<NullViewModelMock>();
             }
 
@@ -662,10 +662,10 @@ namespace Sextant.Tests
                 ParameterViewStackService sut = new ParameterViewStackServiceFixture().WithView(view);
 
                 // When
-                await sut.PushModal<NavigableViewModelMock>();
+                await sut.PushModal<NavigableMock>();
 
                 // Then
-                await view.Received().PushModal(Arg.Any<NavigableViewModelMock>(), Arg.Any<string>(), Arg.Any<bool>());
+                await view.Received().PushModal(Arg.Any<NavigableMock>(), Arg.Any<string>(), Arg.Any<bool>());
             }
         }
 
@@ -777,7 +777,7 @@ namespace Sextant.Tests
             public ThePushPageGenericWithParameterMethod()
             {
                 Locator.CurrentMutable.Register(() => new DefaultViewModelFactory(), typeof(IViewModelFactory));
-                Locator.CurrentMutable.Register(() => new NavigableViewModelMock());
+                Locator.CurrentMutable.Register(() => new NavigableMock());
             }
 
             /// <summary>
@@ -812,10 +812,10 @@ namespace Sextant.Tests
                 ParameterViewStackService sut = new ParameterViewStackServiceFixture().WithView(view);
 
                 // When
-                await sut.PushPage<NavigableViewModelMock>();
+                await sut.PushPage<NavigableMock>();
 
                 // Then
-                await view.Received().PushPage(Arg.Any<NavigableViewModelMock>(), Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<bool>());
+                await view.Received().PushPage(Arg.Any<NavigableMock>(), Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<bool>());
             }
         }
 

@@ -24,7 +24,7 @@ namespace Sextant.Mocks
         /// Initializes a new instance of the <see cref="NavigableMock"/> class.
         /// </summary>
         /// <param name="id">The id of the page.</param>
-        public NavigableMock(string id = null)
+        public NavigableMock(string? id = null)
         {
             _id = id ?? nameof(NavigableMock);
             _navigatedTo = new Subject<Unit>();

@@ -165,10 +165,10 @@ namespace Sextant.Tests
             /// </summary>
             public ThePushPageGenericWithParameterMethod()
             {
-                Locator.CurrentMutable.UnregisterAll<NavigableViewModelMock>();
+                Locator.CurrentMutable.UnregisterAll<NavigableMock>();
                 Locator.CurrentMutable.UnregisterAll<IViewModelFactory>();
                 Locator.CurrentMutable.Register(() => new DefaultViewModelFactory(), typeof(IViewModelFactory));
-                Locator.CurrentMutable.Register(() => new NavigableViewModelMock());
+                Locator.CurrentMutable.Register(() => new NavigableMock());
             }
 
             /// <summary>
@@ -206,7 +206,7 @@ namespace Sextant.Tests
                 // When
                 var result =
                     await Should
-                        .ThrowAsync<ArgumentNullException>(async () => await sut.PushPage<NavigableViewModelMock>(null))
+                        .ThrowAsync<ArgumentNullException>(async () => await sut.PushPage<NavigableMock>(null))
                         .ConfigureAwait(false);
 
                 // Then
@@ -233,10 +233,10 @@ namespace Sextant.Tests
                 ParameterViewStackService sut = new ParameterViewStackServiceFixture().WithView(view);
 
                 // When
-                await sut.PushPage<NavigableViewModelMock>(navigationParameter, contract, reset, animate);
+                await sut.PushPage<NavigableMock>(navigationParameter, contract, reset, animate);
 
                 // Then
-                await view.Received().PushPage(Arg.Any<NavigableViewModelMock>(), contract, reset, animate);
+                await view.Received().PushPage(Arg.Any<NavigableMock>(), contract, reset, animate);
             }
         }
 
@@ -381,10 +381,10 @@ namespace Sextant.Tests
             /// </summary>
             public ThePushModalGenericWithParameterMethod()
             {
-                Locator.CurrentMutable.UnregisterAll<NavigableViewModelMock>();
+                Locator.CurrentMutable.UnregisterAll<NavigableMock>();
                 Locator.CurrentMutable.UnregisterAll<IViewModelFactory>();
                 Locator.CurrentMutable.Register(() => new DefaultViewModelFactory(), typeof(IViewModelFactory));
-                Locator.CurrentMutable.Register(() => new NavigableViewModelMock());
+                Locator.CurrentMutable.Register(() => new NavigableMock());
                 Locator.CurrentMutable.UnregisterAll<NullViewModelMock>();
             }
 
@@ -422,7 +422,7 @@ namespace Sextant.Tests
                 // When
                 var result =
                     await Should
-                        .ThrowAsync<ArgumentNullException>(async () => await sut.PushModal<NavigableViewModelMock>(null))
+                        .ThrowAsync<ArgumentNullException>(async () => await sut.PushModal<NavigableMock>(null))
                         .ConfigureAwait(false);
 
                 // Then
@@ -448,10 +448,10 @@ namespace Sextant.Tests
                 ParameterViewStackService sut = new ParameterViewStackServiceFixture().WithView(view);
 
                 // When
-                await sut.PushModal<NavigableViewModelMock>(navigationParameter, contract, withNavigation);
+                await sut.PushModal<NavigableMock>(navigationParameter, contract, withNavigation);
 
                 // Then
-                await view.Received().PushModal(Arg.Any<NavigableViewModelMock>(), contract, withNavigation);
+                await view.Received().PushModal(Arg.Any<NavigableMock>(), contract, withNavigation);
             }
         }
 
