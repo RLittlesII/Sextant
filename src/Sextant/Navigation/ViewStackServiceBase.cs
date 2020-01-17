@@ -100,7 +100,7 @@ namespace Sextant
                 throw new InvalidOperationException($"{typeof(TViewModel).Name} not found.");
             }
 
-            var page = PageSubject.Value.First(vm => vm.GetType() == typeof(TViewModel));
+            var page = PageSubject.Value.Last(vm => vm.GetType() == typeof(TViewModel));
 
             var pageIndex = PageSubject.Value.LastIndexOf(page);
 
@@ -164,22 +164,6 @@ namespace Sextant
             string? contract = null,
             bool resetStack = false,
             bool animate = true) => PushPage((IViewModel)viewModel, contract, resetStack, animate);
-
-        /// <inheritdoc />
-        public IObservable<Unit> PopToPage<TViewModel>()
-            where TViewModel : class, IViewModel
-        {
-            if (PageSubject.Value.All(vm => vm.GetType() != typeof(TViewModel)))
-            {
-                throw new InvalidOperationException($"{typeof(TViewModel).Name} not found.");
-            }
-
-            var page = PageSubject.Value.First(vm => vm.GetType() == typeof(TViewModel));
-
-            var pageIndex = PageSubject.Value.LastIndexOf(page);
-
-            return Observable.Return(Unit.Default).Do(_ => PopIndexAndTick(PageSubject, pageIndex));
-        }
 
         /// <summary>
         /// Returns the top modal from the current modal stack.
@@ -295,6 +279,11 @@ namespace Sextant
         /// <param name="index">The index.</param>
         protected static void PopToIndexAndTick<T>(BehaviorSubject<IImmutableList<T>> stackSubject, int index)
         {
+            if (stackSubject == null)
+            {
+                throw new ArgumentNullException(nameof(stackSubject));
+            }
+
             IImmutableList<T> poppedStack = ImmutableList<T>.Empty;
             var stack = stackSubject.Value;
 
@@ -303,7 +292,16 @@ namespace Sextant
                 throw new InvalidOperationException("Stack is empty.");
             }
 
-            poppedStack = stack.RemoveRange(index + 1, stack.Count - index - 1);
+            // TODO: Use index to loop?  Find the right element?
+            if (stack.Count > 1)
+            {
+                poppedStack = stack.RemoveRange(stack.IndexOf(stack[1]), stack.Count - index - 1);
+            }
+            else
+            {
+                poppedStack = stack;
+            }
+
             stackSubject.OnNext(poppedStack);
         }
 
