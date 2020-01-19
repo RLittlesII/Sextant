@@ -7,7 +7,7 @@ using ReactiveUI;
 
 namespace Sextant.IOS.Runner
 {
-    internal class PageUiViewController : IViewFor<PageViewModelMock>
+    internal class PageViewController : IViewFor<PageViewModelMock>
     {
         object IViewFor.ViewModel
         {

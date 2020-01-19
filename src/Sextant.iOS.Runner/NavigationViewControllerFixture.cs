@@ -4,6 +4,7 @@
 // See the LICENSE file in the project root for full license information.
 
 using System;
+using System.Diagnostics.Contracts;
 using Microsoft.Reactive.Testing;
 using ReactiveUI;
 using Sextant;
@@ -22,8 +23,11 @@ namespace Sextant.IOS.Runner
         /// <returns>
         /// The result of the conversion.
         /// </returns>
-        public static implicit operator NavigationViewController(NavigationViewControllerFixture fixture) =>
-            fixture.Build();
+        public static implicit operator NavigationViewController(NavigationViewControllerFixture fixture)
+        {
+            Contract.Assert(fixture != null);
+            return fixture.Build();
+        }
 
         private NavigationViewController Build() =>
             new NavigationViewController(new TestScheduler(), new TestScheduler(), new TestViewLocator());

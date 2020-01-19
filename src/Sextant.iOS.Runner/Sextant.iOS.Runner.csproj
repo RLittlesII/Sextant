@@ -67,7 +67,7 @@
     <Compile Include="NavigationViewControllerFixture.cs" />
     <Compile Include="NavigationViewControllerTests.cs" />
     <Compile Include="TestViewLocator.cs" />
-    <Compile Include="PageUiViewController.cs" />
+    <Compile Include="PageViewController.cs" />
     <Compile Include="PageViewModelMock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Content Include="Entitlements.plist" />

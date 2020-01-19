@@ -95,9 +95,9 @@ namespace Sextant
         public IObservable<Unit> PopToPage<TViewModel>()
             where TViewModel : class, IViewModel
         {
-            if (PageSubject.Value.All(vm => vm.GetType() != typeof(TViewModel)))
+            if (PageSubject.Value.Any(vm => vm.GetType() != typeof(TViewModel)))
             {
-                throw new InvalidOperationException($"{typeof(TViewModel).Name} not found.");
+                throw new ViewModelNotFoundException($"{typeof(TViewModel).Name} not found.");
             }
 
             var page = PageSubject.Value.Last(vm => vm.GetType() == typeof(TViewModel));
@@ -285,22 +285,22 @@ namespace Sextant
             }
 
             IImmutableList<T> poppedStack = ImmutableList<T>.Empty;
-            var stack = stackSubject.Value;
 
-            if (stack == null || !stack.Any())
-            {
-                throw new InvalidOperationException("Stack is empty.");
-            }
-
-            // TODO: Use index to loop?  Find the right element?
-            if (stack.Count > 1)
-            {
-                poppedStack = stack.RemoveRange(stack.IndexOf(stack[1]), stack.Count - index - 1);
-            }
-            else
-            {
-                poppedStack = stack;
-            }
+            stackSubject
+                .Take(1)
+                .Where(stack => stack != null)
+                .Subscribe(stack =>
+                {
+                    // TODO: Use index to loop?  Find the right element?
+                    if (stack.Count > 1)
+                    {
+                        poppedStack = stack.RemoveRange(stack.IndexOf(stack[1]), stack.Count - index - 1);
+                    }
+                    else
+                    {
+                        poppedStack = stack;
+                    }
+                });
 
             stackSubject.OnNext(poppedStack);
         }

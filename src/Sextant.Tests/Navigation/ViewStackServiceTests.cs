@@ -248,7 +248,7 @@ namespace Sextant.Tests
                 ViewStackService sut = new ViewStackServiceFixture();
 
                 // When
-                var result = await Should.ThrowAsync<InvalidOperationException>(async () => await sut.PopToPage<FirstViewModel>()).ConfigureAwait(false);
+                var result = await Should.ThrowAsync<ViewModelNotFoundException>(async () => await sut.PopToPage<FirstViewModel>()).ConfigureAwait(false);
 
                 // Then
                 result.Message.ShouldBe("FirstViewModel not found.");
@@ -341,6 +341,7 @@ namespace Sextant.Tests
                 // Given
                 int count = 0;
                 ViewStackService sut = new ViewStackServiceFixture();
+                await sut.PushPage(new FirstViewModel());
                 await sut.PushPage(new NavigableMock(), pages: 3);
 
                 sut
@@ -365,6 +366,7 @@ namespace Sextant.Tests
                 // Given
                 int count = 0;
                 ViewStackService sut = new ViewStackServiceFixture();
+                await sut.PushPage(new FirstViewModel());
                 await sut.PushPage(new NavigableMock(), pages: 3);
 
                 sut

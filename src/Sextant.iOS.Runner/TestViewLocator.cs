@@ -20,7 +20,7 @@ namespace Sextant.IOS.Runner
         public IViewFor ResolveView<T>(T viewModel, string contract = null)
             where T : class
         {
-            return new PageUiViewController();
+            return new PageViewController();
         }
     }
 }
