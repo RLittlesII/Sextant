@@ -13,11 +13,11 @@
 
     protected override Task OnInitializedAsync()
     {
-        SextantSample.ViewModels.Interactions
+        Interactions
                 .ErrorMessage
-                .RegisterHandler(x =>
+                .RegisterHandler(async x =>
                 {
-                    jSRuntime.InvokeVoidAsync("alert", x.Input.Message);
+                    await jSRuntime.InvokeVoidAsync("alert", x.Input.Message);
                     x.SetOutput(true);
                 });
         return Task.CompletedTask;

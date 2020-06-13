@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reflection;
 using System.Text;
@@ -27,11 +28,11 @@ namespace Sextant.Blazor
     /// </summary>
     public class NavigationRouter : ComponentBase, IView, IDisposable, IEnableLogger
     {
+        private readonly CompositeDisposable _routerDisposables = new CompositeDisposable();
         private IScheduler _mainScheduler;
         private bool _initialized;
         private bool _firstPageRendered;
         private IModalView _modalReference;
-
         private Dictionary<string, IViewModel> _viewModelDictionary = new Dictionary<string, IViewModel>();
 
         // Need to mirror the viewmodel stack on IViewStackService.
@@ -356,7 +357,7 @@ namespace Sextant.Blazor
         {
             if (disposing)
             {
-                NavigationManager?.Dispose();
+                _routerDisposables?.Dispose();
             }
         }
 
@@ -372,9 +373,11 @@ namespace Sextant.Blazor
             if (!_initialized)
             {
                 _initialized = true;
+
                 NavigationManager
                     .LocationChanged
-                    .Subscribe(Instance_LocationChanged);
+                    .Subscribe(Instance_LocationChanged)
+                    .DisposeWith(_routerDisposables);
 
                 // Initialize the sextant navigation manager in javascript.
                 await NavigationManager.InitializeAsync(JSRuntime).ConfigureAwait(false);

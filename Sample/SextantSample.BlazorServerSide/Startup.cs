@@ -15,8 +15,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Sextant;
 using Sextant.Blazor;
 using SextantSample.BlazorServerSide.Data;
+using SextantSample.ViewModels;
 using Splat;
 using Splat.Microsoft.Extensions.DependencyInjection;
 
@@ -42,11 +44,19 @@ namespace SextantSample.BlazorServerSide
             //})
             //    .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            services.AddAuthentication(AzureADDefaults.OpenIdScheme)
+            services
+                .AddAuthentication(AzureADDefaults.OpenIdScheme)
                 .AddAzureAD(options => Configuration.Bind("AzureAd", options));
 
-            // Sextant.Sextant.Instance.InitializeBlazor();
-            services.AddSextant();
+            services
+                .AddSextant()
+                .RegisterRoutes(configuration =>
+                    configuration
+                        .RegisterRoute<Pages.HomeView, HomeViewModel>("/")
+                        .RegisterRoute<Pages.RedView, RedViewModel>("/red")
+                        .RegisterRoute<Pages.GreenView, GreenViewModel>("/green")
+                        .RegisterRoute<Pages.FirstModalView, FirstModalViewModel>("/firstModal")
+                        .RegisterRoute<Pages.SecondModalView, SecondModalViewModel>("/secondModal"));
 
             services.Configure<OpenIdConnectOptions>(AzureADDefaults.OpenIdScheme, options =>
             {
