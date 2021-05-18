@@ -9,9 +9,7 @@ namespace SextantSample.BlazorClientSide
         {
         }
 
-        public void Configure(IComponentsApplicationBuilder app)
-        {
+        public void Configure(IComponentsApplicationBuilder app) =>
             app.AddComponent<App>("app");
-        }
     }
 }

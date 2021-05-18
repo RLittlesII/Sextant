@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019 .NET Foundation and Contributors. All rights reserved.
+﻿// Copyright (c) 2021 .NET Foundation and Contributors. All rights reserved.
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
@@ -10,8 +10,8 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using DiffEngine;
 using PublicApiGenerator;
-using Shouldly;
 using Splat;
 using Xunit;
 
@@ -23,22 +23,24 @@ namespace Sextant.Blazor.Tests
     [ExcludeFromCodeCoverage]
     public class ApiApprovalTests
     {
-        private static readonly Regex _removeCoverletSectionRegex = new Regex(@"^namespace Coverlet\.Core\.Instrumentation\.Tracker.*?^}", RegexOptions.Singleline | RegexOptions.Multiline | RegexOptions.Compiled);
+        private static readonly Regex _removeCoverletSectionRegex = new(@"^namespace Coverlet\.Core\.Instrumentation\.Tracker.*?^}", RegexOptions.Singleline | RegexOptions.Multiline | RegexOptions.Compiled);
 
         /// <summary>
         /// Tests to make sure the splat project is approved.
         /// </summary>
         [Fact]
-        public void SextantBlazor()
-        {
-            CheckApproval(typeof(NavigationRouter).Assembly);
-        }
+        public void SextantBlazorForms() => CheckApproval(typeof(NavigationRouter).Assembly);
 
-        private static void CheckApproval(Assembly assembly, [CallerMemberName]string memberName = null, [CallerFilePath]string filePath = null)
+        private static void CheckApproval(Assembly assembly, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null)
         {
             var targetFrameworkName = Assembly.GetExecutingAssembly().GetTargetFrameworkName();
 
             var sourceDirectory = Path.GetDirectoryName(filePath);
+
+            if (sourceDirectory is null)
+            {
+                throw new ArgumentException("The directory name is empty for path: " + filePath);
+            }
 
             var approvedFileName = Path.Combine(sourceDirectory, $"ApiApprovalTests.{memberName}.{targetFrameworkName}.approved.txt");
             var receivedFileName = Path.Combine(sourceDirectory, $"ApiApprovalTests.{memberName}.{targetFrameworkName}.received.txt");
@@ -55,12 +57,12 @@ namespace Sextant.Blazor.Tests
 
             var approvedPublicApi = File.ReadAllText(approvedFileName);
 
-            var receivedPublicApi = Filter(ApiGenerator.GeneratePublicApi(assembly, null));
+            var receivedPublicApi = Filter(assembly.GeneratePublicApi());
 
             if (!string.Equals(receivedPublicApi, approvedPublicApi, StringComparison.InvariantCulture))
             {
                 File.WriteAllText(receivedFileName, receivedPublicApi);
-                ShouldlyConfiguration.DiffTools.GetDiffTool().Open(receivedFileName, approvedFileName, true);
+                DiffRunner.Launch(receivedFileName, approvedFileName);
             }
 
             Assert.Equal(approvedPublicApi, receivedPublicApi);
@@ -73,7 +75,8 @@ namespace Sextant.Blazor.Tests
                 new[]
                 {
                     Environment.NewLine
-                }, StringSplitOptions.RemoveEmptyEntries)
+                },
+                StringSplitOptions.RemoveEmptyEntries)
                     .Where(l =>
                     !l.StartsWith("[assembly: AssemblyVersion(", StringComparison.InvariantCulture) &&
                     !l.StartsWith("[assembly: AssemblyFileVersion(", StringComparison.InvariantCulture) &&

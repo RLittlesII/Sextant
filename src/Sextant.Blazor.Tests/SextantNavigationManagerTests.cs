@@ -1,14 +1,14 @@
-// Copyright (c) 2019 .NET Foundation and Contributors. All rights reserved.
+// Copyright (c) 2021 .NET Foundation and Contributors. All rights reserved.
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.JSInterop;
 using NSubstitute;
 using NSubstitute.ReceivedExtensions;
-using Shouldly;
 using Xunit;
 
 namespace Sextant.Blazor.Tests
@@ -33,7 +33,7 @@ namespace Sextant.Blazor.Tests
             var result = manager.AbsoluteUri;
 
             // Then
-            result.ShouldBe("https://reactiveui.net");
+            result.Should().Be("https://reactiveui.net");
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace Sextant.Blazor.Tests
             var result = manager.BaseUri;
 
             // Then
-            result.ShouldBe("https://reactiveui.net");
+            result.Should().Be("https://reactiveui.net");
         }
 
         /// <summary>
@@ -72,10 +72,10 @@ namespace Sextant.Blazor.Tests
 
             // When
             await manager.InitializeAsync(jsRuntime).ConfigureAwait(false);
-            await manager.GoBackAsync();
+            await manager.GoBackAsync().ConfigureAwait(true);
 
             // Then
-            received.ShouldBeTrue();
+            received.Should().BeTrue();
         }
 
         /// <summary>
@@ -96,10 +96,10 @@ namespace Sextant.Blazor.Tests
 
             // When
             await manager.InitializeAsync(jsRuntime).ConfigureAwait(false);
-            await manager.ClearHistory();
+            await manager.ClearHistory().ConfigureAwait(true);
 
             // Then
-            received.ShouldBeTrue();
+            received.Should().BeTrue();
         }
 
         /// <summary>
@@ -120,10 +120,10 @@ namespace Sextant.Blazor.Tests
 
             // When
             await manager.InitializeAsync(jsRuntime).ConfigureAwait(false);
-            await manager.ReplaceStateAsync("1");
+            await manager.ReplaceStateAsync("1").ConfigureAwait(true);
 
             // Then
-            received.ShouldBeTrue();
+            received.Should().BeTrue();
         }
 
         /// <summary>
@@ -144,10 +144,10 @@ namespace Sextant.Blazor.Tests
 
             // When
             await manager.InitializeAsync(jsRuntime).ConfigureAwait(false);
-            await manager.GoToRootAsync(1);
+            await manager.GoToRootAsync(1).ConfigureAwait(true);
 
             // Then
-            received.ShouldBeTrue();
+            received.Should().BeTrue();
         }
     }
 }
