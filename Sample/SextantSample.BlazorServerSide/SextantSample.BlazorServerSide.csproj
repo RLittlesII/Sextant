@@ -14,7 +14,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="ReactiveUI.Blazor" Version="13.*" />
-    <PackageReference Include="Splat.Microsoft.Extensions.DependencyInjection" Version="9.*" />
+    <PackageReference Include="Splat.Microsoft.Extensions.DependencyInjection" Version="11.*" />
   </ItemGroup>
 
   <ItemGroup>

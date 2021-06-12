@@ -39,14 +39,12 @@ namespace Sextant.Blazor
             this IServiceCollection services,
             Action<IRouteConfiguration> routeConfiguration)
         {
-            services.AddSingleton<IView, NavigationRouter>();
-            services.AddSingleton<IParameterViewStackService, ParameterViewStackService>();
-            services.AddSingleton<SextantNavigationManager>();
-            services.AddSingleton<DefaultViewModelFactory>();
-            services.AddSingleton<RouteViewViewModelLocator>();
-            services.AddSingleton<UrlParameterViewModelGenerator>();
-            services.RegisterRoutes(routeConfiguration);
-            return services;
+            return services.AddSingleton<IView, NavigationRouter>()
+                .AddSingleton<IViewStackService, ParameterViewStackService>()
+                .AddSingleton<IParameterViewStackService, ParameterViewStackService>()
+                .AddSingleton<SextantNavigationManager>().AddSingleton<DefaultViewModelFactory>()
+                .AddSingleton<RouteViewViewModelLocator>().AddSingleton<UrlParameterViewModelGenerator>()
+                .RegisterRoutes(routeConfiguration);
         }
 
         /// <summary>
@@ -54,7 +52,8 @@ namespace Sextant.Blazor
         /// </summary>
         /// <param name="serviceCollection">The service collection.</param>
         /// <param name="routeConfiguration">The route configuration.</param>
-        public static void RegisterRoutes(
+        /// <returns>The services.</returns>
+        public static IServiceCollection RegisterRoutes(
             this IServiceCollection serviceCollection,
             Action<IRouteConfiguration> routeConfiguration)
         {
@@ -64,6 +63,7 @@ namespace Sextant.Blazor
             }
 
             routeConfiguration(new RouteConfiguration(serviceCollection));
+            return serviceCollection;
         }
     }
 }
