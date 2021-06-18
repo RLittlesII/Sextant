@@ -42,8 +42,10 @@ namespace Sextant.Blazor
             return services.AddSingleton<IView, NavigationRouter>()
                 .AddSingleton<IViewStackService, ParameterViewStackService>()
                 .AddSingleton<IParameterViewStackService, ParameterViewStackService>()
-                .AddSingleton<SextantNavigationManager>().AddSingleton<DefaultViewModelFactory>()
-                .AddSingleton<RouteViewViewModelLocator>().AddSingleton<UrlParameterViewModelGenerator>()
+                .AddSingleton<SextantNavigationManager>()
+                .AddSingleton<DefaultViewModelFactory>()
+                .AddSingleton<RouteViewViewModelLocator>()
+                .AddSingleton<UrlParameterViewModelGenerator>()
                 .RegisterRoutes(routeConfiguration);
         }
 

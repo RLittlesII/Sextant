@@ -18,6 +18,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Sextant.Blazor\Sextant.Blazor.csproj" />
+      <ProjectReference Include="..\Sextant.Mocks\Sextant.Mocks.csproj" />
     </ItemGroup>
 
     <ItemGroup>
