@@ -70,7 +70,7 @@ namespace Sextant.Blazor
         public Type ModalComponent { get; set; }
 
         /// <inheritdoc/>
-        public IScheduler MainThreadScheduler => _mainScheduler;
+        public IScheduler MainThreadScheduler => WasmScheduler.Default;
 
         /// <inheritdoc/>
         public IObservable<IViewModel> PagePopped { get; set; } = Observable.Never<IViewModel>();
@@ -390,7 +390,7 @@ namespace Sextant.Blazor
 
                     // When the blazor app first starts, a page will have already been loaded so it's too late for the page creation logic (in ReactiveRouteView) to set the viewmodel.
                     // We have to do it manually here.
-                    ((IViewFor)CurrentView).ViewModel = CurrentViewModel;
+                    // ((IViewFor)CurrentView).ViewModel = CurrentViewModel;
                 }
 
                 _firstPageRendered = true;

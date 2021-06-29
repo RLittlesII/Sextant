@@ -125,21 +125,21 @@ namespace Sextant.Blazor
                 {
                     // this works for url and link navigation, but CurrentViewModel not set in time for popstate nav.
                     _logger.Debug($"{nameof(RouteView)}: Checking VM not null");
-                    var viewModel = RouteLocator.GetRoute(viewFor.GetType());
-                    if (Router.CurrentViewModel != null)
-                    {
-                        _logger.Debug($"{nameof(RouteView)}: Getting VM type from IViewFor<>");
-                        var i = viewFor.GetType().GetInterfaces().FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IViewFor<>));
-                        _logger.Debug($"{nameof(RouteView)}: Type required is {i.GetGenericArguments()[0]}");
+                    viewFor.ViewModel = RouteLocator.GetRoute(viewFor.GetType());
 
-                        var args = i.GetGenericArguments();
-                        _logger.Debug($"{nameof(RouteView)}: CurrentViewModel Type is {Router.CurrentViewModel}");
-                        if (args.Length > 0 && args[0].FullName == Router.CurrentViewModel.GetType().FullName)
-                        {
-                            viewFor.ViewModel = Router.CurrentViewModel;
-                        }
-                    }
-
+                    // if (Router.CurrentViewModel != null)
+                    // {
+                    //     _logger.Debug($"{nameof(RouteView)}: Getting VM type from IViewFor<>");
+                    //     var i = viewFor.GetType().GetInterfaces().FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IViewFor<>));
+                    //     _logger.Debug($"{nameof(RouteView)}: Type required is {i.GetGenericArguments()[0]}");
+                    //
+                    //     var args = i.GetGenericArguments();
+                    //     _logger.Debug($"{nameof(RouteView)}: CurrentViewModel Type is {Router.CurrentViewModel}");
+                    //     if (args.Length > 0 && args[0].FullName == Router.CurrentViewModel.GetType().FullName)
+                    //     {
+                    //         viewFor.ViewModel = Router.CurrentViewModel;
+                    //     }
+                    // }
                     Router.CurrentView = viewFor;
                 }
             });
