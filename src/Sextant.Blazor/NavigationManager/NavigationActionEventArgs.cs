@@ -14,42 +14,32 @@ namespace Sextant.Blazor
     /// </summary>
     public class NavigationActionEventArgs
     {
-        private string _uri;
-        private string _id;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="NavigationActionEventArgs"/> class.
         /// </summary>
-        public NavigationActionEventArgs()
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="NavigationActionEventArgs"/> class.
-        /// </summary>
-        /// <param name="sextantNavigationType">Type of navigation: back, forward, uri.</param>
-        /// <param name="uri">Current Uri.</param>
         /// <param name="id">Current viewmodel Id.</param>
-        public NavigationActionEventArgs(SextantNavigationType sextantNavigationType, string uri, string id)
+        /// <param name="uri">Current Uri.</param>
+        /// <param name="sextantNavigationType">Type of navigation: back, forward, uri.</param>
+        public NavigationActionEventArgs(string id, string uri, SextantNavigationType sextantNavigationType)
         {
-            NavigationType = sextantNavigationType;
-            Uri = uri;
             Id = id;
+            Uri = uri;
+            NavigationType = sextantNavigationType;
         }
+
+        /// <summary>
+        /// Gets or the id.
+        /// </summary>
+        public string Id { get; }
+
+        /// <summary>
+        /// Gets the Uri.
+        /// </summary>
+        public string Uri { get; }
 
         /// <summary>
         /// Gets or sets a value indicating whether navigation has actually occurred yet.
         /// </summary>
         public SextantNavigationType NavigationType { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Uri.
-        /// </summary>
-        public string Uri { get; set; }
-
-        /// <summary>
-        /// Gets or sets the id.
-        /// </summary>
-        public string Id { get; set; }
     }
 }

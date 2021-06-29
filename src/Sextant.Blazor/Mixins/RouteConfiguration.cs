@@ -28,19 +28,12 @@ namespace Sextant.Blazor
             where TView : class, IComponent, IViewFor<TViewModel>
             where TViewModel : class, IViewModel
         {
-            // var blazorResolver = Locator.Current.GetService<RouteViewViewModelLocator>();
-            // blazorResolver.Register<TView, TViewModel>(route, contract);
-            //
-            // var urlVmGenerator = Locator.Current.GetService<UrlParameterViewModelGenerator>();
-            // urlVmGenerator.Register<TViewModel>(generator);
-
-            // Register the IViewFor
-
             // TODO: [rlittlesii: June 13, 2020] register route by the key.
             _serviceCollection.AddTransient<IViewFor<TViewModel>, TView>();
 
             // Register the ViewModel
             _serviceCollection.AddTransient<TViewModel>();
+            RouteLocator.ViewToViewModelDictionary.TryAdd(typeof(TView), typeof(TViewModel));
             return this;
         }
     }

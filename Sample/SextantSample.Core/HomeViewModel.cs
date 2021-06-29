@@ -16,8 +16,8 @@ namespace SextantSample.ViewModels
 
         public ReactiveCommand<Unit, Unit> PushGenericPage { get; set; }
 
-        public HomeViewModel()
-            : base(Locator.Current.GetService<IViewStackService>())
+        public HomeViewModel(IViewStackService viewStackService)
+            : base(viewStackService)
         {
             OpenModal = ReactiveCommand
                 .CreateFromObservable(() =>

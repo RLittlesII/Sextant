@@ -27,6 +27,7 @@ namespace Sextant.Blazor
                 .AddSingleton<SextantNavigationManager>()
                 .AddSingleton<DefaultViewModelFactory>()
                 .AddSingleton<RouteViewViewModelLocator>()
+                .AddSingleton(provider => new RouteLocator(provider))
                 .AddSingleton<UrlParameterViewModelGenerator>();
 
         /// <summary>
@@ -45,6 +46,7 @@ namespace Sextant.Blazor
                 .AddSingleton<SextantNavigationManager>()
                 .AddSingleton<DefaultViewModelFactory>()
                 .AddSingleton<RouteViewViewModelLocator>()
+                .AddSingleton(provider => new RouteLocator(provider))
                 .AddSingleton<UrlParameterViewModelGenerator>()
                 .RegisterRoutes(routeConfiguration);
         }

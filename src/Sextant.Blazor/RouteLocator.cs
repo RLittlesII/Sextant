@@ -4,11 +4,11 @@
 // See the LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
+using ReactiveUI;
 
 namespace Sextant.Blazor
 {
@@ -17,27 +17,7 @@ namespace Sextant.Blazor
     /// </summary>
     public class RouteLocator
     {
-        /// <summary>
-        /// Used to resolve View Type from ViewModel Type string and contract.
-        /// </summary>
-        private Dictionary<(string vmTypeName, string contract), Type> _viewModelToViewTypeDictionary;
-
-        /// <summary>
-        /// Used to resolve ViewModel Type from View Type string.
-        /// </summary>
-        private Dictionary<string, Type> _viewToViewModelTypeDictionary;
-
-        /// <summary>
-        /// Used to resolve ViewModel Type from a url route.
-        /// This is Blazor specific as a user can just type in a URL directly (or a bookmark).
-        /// </summary>
-        private Dictionary<string, Type> _routeToViewModelTypeDictionary;
-
-        /// <summary>
-        /// Used to resolve a url route for a ViewModel Type string.
-        /// This is Blazor specific as a user can just type in a URL directly (or a bookmark).
-        /// </summary>
-        private Dictionary<string, string> _viewModelTypeToRouteDictionary;
+        private readonly IServiceProvider _provider;
 
         private Dictionary<Type, IViewModel> _routes;
 
@@ -47,34 +27,31 @@ namespace Sextant.Blazor
         /// <param name="provider">The service provider.</param>
         public RouteLocator(IServiceProvider provider)
         {
-            _viewModelToViewTypeDictionary = new Dictionary<(string vmTypeName, string contract), Type>();
-            _viewToViewModelTypeDictionary = new Dictionary<string, Type>();
-
-            _routeToViewModelTypeDictionary = new Dictionary<string, Type>();
-            _viewModelTypeToRouteDictionary = new Dictionary<string, string>();
+            _provider = provider;
 
             // QUESTION: [rlittlesii: June 12, 2021] Get this by type or use the Id?  Or should we formalize Route and enforce a url segment?
             _routes = provider.GetServices<IViewModel>().ToDictionary(x => x.GetType());
         }
 
         /// <summary>
-        /// Method to get route for viewmodel type.
+        /// Gets the <see cref="IViewFor"/> dictionary.
         /// </summary>
-        /// <param name="viewModelType">The viewmodel Type.</param>
+        public static ConcurrentDictionary<Type, Type> ViewToViewModelDictionary { get; } = new ConcurrentDictionary<Type, Type>();
+
+        /// <summary>
+        /// Gets the route for the registered type.
+        /// </summary>
+        /// <param name="viewType">The view type.</param>
         /// <returns>The route.</returns>
-        public string ResolveRoute(Type viewModelType)
+        public object GetRoute(Type viewType)
         {
-            if (viewModelType == null)
+            if (viewType == null)
             {
-                throw new ArgumentNullException(nameof(viewModelType));
+                throw new ArgumentNullException(nameof(viewType));
             }
 
-            if (_viewModelTypeToRouteDictionary.ContainsKey(viewModelType.AssemblyQualifiedName))
-            {
-                return _viewModelTypeToRouteDictionary[viewModelType.AssemblyQualifiedName];
-            }
-
-            return null;
+            Type serviceType = ViewToViewModelDictionary[viewType];
+            return _provider.GetService(serviceType);
         }
     }
 }

@@ -55,10 +55,8 @@ namespace Sextant.Blazor
         public async Task InitializeAsync(IJSRuntime jSRuntime)
         {
             _jsRuntime = jSRuntime;
-#pragma warning disable RCS1090 // Call 'ConfigureAwait(false)'.
-            _baseUri = await _jsRuntime.InvokeAsync<string>(SextantFunctions.GetBaseUri);
-            _absoluteUri = await _jsRuntime.InvokeAsync<string>(SextantFunctions.GetLocationHref);
-#pragma warning restore RCS1090 // Call 'ConfigureAwait(false)'.
+            _baseUri = await _jsRuntime.InvokeAsync<string>(SextantFunctions.GetBaseUri).ConfigureAwait(false);
+            _absoluteUri = await _jsRuntime.InvokeAsync<string>(SextantFunctions.GetLocationHref).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -137,14 +135,14 @@ namespace Sextant.Blazor
         /// <summary>
         /// Triggers the <see cref="LocationChanged"/> event with the current URI value.
         /// </summary>
-        /// <param name="sextantNavigationType">The navigation type.</param>
-        /// <param name="uri">The uri.</param>
         /// <param name="id">The id.</param>
-        public void NotifyNavigationAction(SextantNavigationType sextantNavigationType, string uri, string id)
+        /// <param name="uri">The uri.</param>
+        /// <param name="sextantNavigationType">The navigation type.</param>
+        public void NotifyNavigationAction(string id, string uri, SextantNavigationType sextantNavigationType)
         {
             try
             {
-                _locationChanged.OnNext(new NavigationActionEventArgs(sextantNavigationType, uri, id));
+                _locationChanged.OnNext(new NavigationActionEventArgs(id, uri, sextantNavigationType));
             }
             catch (Exception ex)
             {

@@ -40,7 +40,7 @@ namespace Sextant.Blazor
             try
             {
                 _navigationManager
-                    .NotifyNavigationAction(sextantNavigationType, uri, ((JsonElement?)state?["id"])?.GetString());
+                    .NotifyNavigationAction(((JsonElement?)state?["id"])?.GetString(), uri, sextantNavigationType);
             }
             catch (Exception exception)
             {
