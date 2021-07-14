@@ -4,11 +4,9 @@
 // See the LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using ReactiveUI;
 
 namespace Sextant.Blazor
 {
@@ -19,7 +17,7 @@ namespace Sextant.Blazor
     {
         private readonly IServiceProvider _provider;
 
-        private Dictionary<Type, IViewModel> _routes;
+        private Dictionary<string, SextantRoute> _routes;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RouteLocator"/> class.
@@ -30,13 +28,8 @@ namespace Sextant.Blazor
             _provider = provider;
 
             // QUESTION: [rlittlesii: June 12, 2021] Get this by type or use the Id?  Or should we formalize Route and enforce a url segment?
-            _routes = provider.GetServices<IViewModel>().ToDictionary(x => x.GetType());
+            _routes = provider.GetServices<SextantRoute>().ToDictionary(x => x.Uri);
         }
-
-        /// <summary>
-        /// Gets the <see cref="IViewFor"/> dictionary.
-        /// </summary>
-        public static ConcurrentDictionary<Type, Type> ViewToViewModelDictionary { get; } = new ConcurrentDictionary<Type, Type>();
 
         /// <summary>
         /// Gets the route for the registered type.
@@ -50,8 +43,40 @@ namespace Sextant.Blazor
                 throw new ArgumentNullException(nameof(viewType));
             }
 
-            Type serviceType = ViewToViewModelDictionary[viewType];
-            return _provider.GetService(serviceType);
+            Type viewModelType = RouteRegistration.ViewToViewModelDictionary[viewType];
+            return _provider.GetService(viewModelType);
+        }
+
+        /// <summary>
+        /// Gets the route for the registered type.
+        /// </summary>
+        /// <param name="uri">The view type.</param>
+        /// <returns>The route.</returns>
+        public IViewModel GetRoute(string uri)
+        {
+            if (uri == null)
+            {
+                throw new ArgumentNullException(nameof(uri));
+            }
+
+            var route = _routes.First(x => x.Key == uri).Value;
+            return (IViewModel)_provider.GetService(route.ViewModelType);
+        }
+
+        /// <summary>
+        /// Gets the route for the registered type.
+        /// </summary>
+        /// <param name="viewModel">The view model.</param>
+        /// <returns>The route.</returns>
+        public SextantRoute GetRoute(IViewModel viewModel)
+        {
+            if (viewModel == null)
+            {
+                throw new ArgumentNullException(nameof(viewModel));
+            }
+
+            SextantRoute route = _routes.First(x => x.Value.ViewModelType == viewModel.GetType()).Value;
+            return route;
         }
     }
 }

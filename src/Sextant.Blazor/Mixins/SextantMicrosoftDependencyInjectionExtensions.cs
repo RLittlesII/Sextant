@@ -4,8 +4,10 @@
 // See the LICENSE file in the project root for full license information.
 
 using System;
+using System.Reactive.Concurrency;
 using DynamicData;
 using Microsoft.Extensions.DependencyInjection;
+using ReactiveUI;
 using Splat;
 
 namespace Sextant.Blazor
@@ -20,15 +22,18 @@ namespace Sextant.Blazor
         /// </summary>
         /// <param name="services">The service collection.</param>
         /// <returns>The services.</returns>
-        public static IServiceCollection AddSextant(this IServiceCollection services) =>
-            services.AddSingleton<IView, NavigationRouter>()
+        public static IServiceCollection AddSextant(this IServiceCollection services)
+        {
+            RxApp.MainThreadScheduler = WasmScheduler.Default;
+            return services.AddSingleton<IView, NavigationRouter>()
                 .AddSingleton<IViewStackService, ParameterViewStackService>()
                 .AddSingleton<IParameterViewStackService, ParameterViewStackService>()
-                .AddSingleton<SextantNavigationManager>()
+                .AddSingleton(SextantNavigationManager.Instance)
                 .AddSingleton<DefaultViewModelFactory>()
                 .AddSingleton<RouteViewViewModelLocator>()
-                .AddSingleton(provider => new RouteLocator(provider))
+                .AddSingleton<RouteLocator>(provider => new RouteLocator(provider))
                 .AddSingleton<UrlParameterViewModelGenerator>();
+        }
 
         /// <summary>
         /// Adds Sextant dependencies to the service collection.
@@ -36,20 +41,10 @@ namespace Sextant.Blazor
         /// <param name="services">The service collection.</param>
         /// <param name="routeConfiguration">The route configuration.</param>
         /// <returns>The services.</returns>
-        public static IServiceCollection AddSextant(
-            this IServiceCollection services,
-            Action<IRouteConfiguration> routeConfiguration)
-        {
-            return services.AddSingleton<IView, NavigationRouter>()
-                .AddSingleton<IViewStackService, ParameterViewStackService>()
-                .AddSingleton<IParameterViewStackService, ParameterViewStackService>()
-                .AddSingleton<SextantNavigationManager>()
-                .AddSingleton<DefaultViewModelFactory>()
-                .AddSingleton<RouteViewViewModelLocator>()
-                .AddSingleton(provider => new RouteLocator(provider))
-                .AddSingleton<UrlParameterViewModelGenerator>()
+        public static IServiceCollection AddSextant(this IServiceCollection services, Action<IRouteConfiguration> routeConfiguration) =>
+            services
+                .AddSextant()
                 .RegisterRoutes(routeConfiguration);
-        }
 
         /// <summary>
         /// Registers a route for sextant.

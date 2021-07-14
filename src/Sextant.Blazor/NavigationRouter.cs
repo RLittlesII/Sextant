@@ -73,7 +73,7 @@ namespace Sextant.Blazor
         public IScheduler MainThreadScheduler => WasmScheduler.Default;
 
         /// <inheritdoc/>
-        public IObservable<IViewModel> PagePopped { get; set; } = Observable.Never<IViewModel>();
+        public IObservable<IViewModel> PagePopped { get; private set; } = Observable.Never<IViewModel>();
 
         internal IViewModel CurrentViewModel => _mainStack.Count > 0 ? _mainStack.Peek() : null;
 
@@ -89,8 +89,10 @@ namespace Sextant.Blazor
         private SextantNavigationManager SextantNavigationManager { get; set; }
 
         [Inject]
-        private RouteViewViewModelLocator RouteViewViewModelLocator { get; set; }
+        private RouteLocator RouteLocator { get; set; }
 
+        // [Inject]
+        // private RouteViewViewModelLocator RouteViewViewModelLocator { get; set; }
         [Inject]
         private UrlParameterViewModelGenerator UrlParameterVmGenerator { get; set; }
 
@@ -158,32 +160,30 @@ namespace Sextant.Blazor
         }
 
         /// <inheritdoc/>
-        public IObservable<Unit> PushModal(IViewModel modalViewModel, string contract, bool withNavigationPage = true)
-        {
-            return Observable.Start(
-                async () =>
-                {
-                    if (_modalReference == null)
+        public IObservable<Unit> PushModal(IViewModel modalViewModel, string contract, bool withNavigationPage = true) =>
+            Observable.Start(
+                    async () =>
                     {
-                        throw new Exception("Your modal component type hasn't been defined in SextantRouter.  Make sure it implements IModalView.");
-                    }
+                        if (_modalReference == null)
+                        {
+                            throw new Exception("Your modal component type hasn't been defined in SextantRouter.  Make sure it implements IModalView.");
+                        }
 
-                    var viewType = RouteViewViewModelLocator.ResolveViewType(modalViewModel.GetType(), string.IsNullOrWhiteSpace(contract) ? null : contract);
+                        var viewType = RouteLocator.GetRoute(modalViewModel);
 
-                    if (viewType == null)
-                    {
-                        throw new Exception($"A view hasn't been registered for the viewmodel type, {modalViewModel.GetType()}, with contract, {contract}.");
-                    }
+                        if (viewType == null)
+                        {
+                            throw new Exception($"A view hasn't been registered for the viewmodel type, {modalViewModel.GetType()}, with contract, {contract}.");
+                        }
 
-                    // Save the type in a view backstack for later.  Since the StackService doesn't save the contract, we won't know exactly what view to use otherwise.
-                    _modalBackStack.Push(viewType);
+                        // Save the type in a view backstack for later.  Since the StackService doesn't save the contract, we won't know exactly what view to use otherwise.
+                        _modalBackStack.Push(viewType.ViewType);
 
-                    await _modalReference.ShowViewAsync(viewType, modalViewModel).ConfigureAwait(false);
+                        await _modalReference.ShowViewAsync(viewType.ViewType, modalViewModel).ConfigureAwait(false);
 
-                    return Unit.Default;
-                })
+                        return Unit.Default;
+                    })
                 .Concat();
-        }
 
         /// <inheritdoc/>
         public IObservable<Unit> PushPage(IViewModel viewModel, string contract, bool resetStack, bool animate = true)
@@ -219,7 +219,9 @@ namespace Sextant.Blazor
                     else
                     {
                         // If not, look it up in the RouteViewViewModelLocator
-                        route = RouteViewViewModelLocator.ResolveRoute(viewModel.GetType());
+
+                        // @bjorkstromm this is null
+                        route = RouteLocator.GetRoute(viewModel).Uri;
                     }
 
                     // Force all routes to be relative.
@@ -268,8 +270,7 @@ namespace Sextant.Blazor
                     // Place this generated key within the History state so we know what viewmodel to restore on popevents.
                     _ = SextantNavigationManager.ReplaceStateAsync(pair.Key);
                     return Unit.Default;
-                },
-                MainThreadScheduler);
+                });
         }
 
         /// <inheritdoc />
@@ -495,16 +496,17 @@ namespace Sextant.Blazor
 
             if (segments.Length == 0)
             {
-                viewModelType = RouteViewViewModelLocator.ResolveViewModelType("/");
+                // @bjorkstromm this has a value
+                viewModel = RouteLocator.GetRoute("/");
             }
             else
             {
-                viewModelType = RouteViewViewModelLocator.ResolveViewModelType("/" + segments[0]);
+                viewModel = RouteLocator.GetRoute("/" + segments[0]);
             }
 
             if (id == null)
             {
-                viewModel = UrlParameterVmGenerator.GetViewModel(viewModelType, parameters);
+                // viewModel = UrlParameterVmGenerator.GetViewModel(viewModelType, parameters);
             }
             else
             {

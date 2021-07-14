@@ -65,7 +65,7 @@ namespace Sextant.Blazor
         /// Gets or sets the <see cref="RouteLocator"/>.
         /// </summary>
         [Inject]
-        public RouteLocator RouteLocator { get; set; }
+        private RouteLocator RouteLocator { get; set; }
 
         /// <inheritdoc />
         public void Attach(RenderHandle renderHandle)
@@ -125,6 +125,8 @@ namespace Sextant.Blazor
                 {
                     // this works for url and link navigation, but CurrentViewModel not set in time for popstate nav.
                     _logger.Debug($"{nameof(RouteView)}: Checking VM not null");
+
+                    // @bjorkstromm this has a value
                     viewFor.ViewModel = RouteLocator.GetRoute(viewFor.GetType());
 
                     // if (Router.CurrentViewModel != null)

@@ -33,7 +33,7 @@ namespace SextantSample
             Locator
                 .Current
                 .GetService<IViewStackService>()
-                .PushPage(new HomeViewModel(), null, true, false)
+                .PushPage(new HomeViewModel(Locator.Current.GetService<IViewStackService>()), null, true, false)
                 .Subscribe();
 
             MainPage = Locator.Current.GetNavigationView();

@@ -17,7 +17,7 @@
                 .ErrorMessage
                 .RegisterHandler(async x =>
                 {
-                    await jSRuntime.InvokeVoidAsync("alert", x.Input.Message);
+                    await jSRuntime.InvokeVoidAsync("alert", x.Input.Message, x.Input.StackTrace);
                     x.SetOutput(true);
                 });
         return Task.CompletedTask;

@@ -19,6 +19,11 @@ namespace Sextant.Blazor
     /// </summary>
     public sealed class SextantNavigationManager : IDisposable
     {
+        /// <summary>
+        /// The static instance.
+        /// </summary>
+        public static readonly SextantNavigationManager Instance = new SextantNavigationManager();
+
         private readonly Subject<NavigationActionEventArgs> _locationChanged;
         private IJSRuntime _jsRuntime;
         private string _baseUri;
